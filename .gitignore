@@ -1,0 +1,13 @@
+/compilation/result/
+config.ini
+output/main.exe
+test.css
+config1.ini
+/.vs/ProjectSettings.json
+/.vs
+/venv/
+/TEMP/
+*.json
+*.ini
+*.csv
+logs/
