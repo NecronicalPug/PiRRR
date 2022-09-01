@@ -15,7 +15,7 @@ For both versions you can select custom team files and destination files, file e
 Using the iRacing UI, download the results of the session you want to read (Export results button) and choose the results file.
 
 ### iRSDK Version
-Joining a session and pressing the IRSDK button exports results.
+Joining a session and pressing the IRSDK button while iRacing connection status says True exports results.
 
 ### Custom Team File
 Here is a template for the custom team file. Team name is the key and the value is an array of driver names (use display names for the particular session you're in).
