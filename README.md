@@ -8,13 +8,13 @@ What does it do:
 
 ## Usage
 
+Do note that the output is all in .csv. You will have to import it into something like Excel for it to be truly readable, which is a few clicks to do but is still extra effort.
+
 ### JSON Version
 Using the iRacing UI, download the results of the session you want to read (Export results button). Run the application and provide the directories of your custom team file and the destination of the results file (optional)
 
 ### iRSDK Version
 Joining a session and pressing the export results button with the custom team file and destination name directories (optional) will return the same results.
-
-Do note that the results are all in .csv. You will have to import it into something like Excel for it to be truly readable, which is a few clicks to do but is still extra effort.
 
 ### Custom Team File
 Here is a template for the custom team file. Team name is the key and the value is an array of driver names (use display names for the particular session you're in).
