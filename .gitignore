@@ -11,3 +11,7 @@ config1.ini
 *.ini
 *.csv
 logs/
+
+*.xlsx
+
+.idea/csv-plugin.xml
