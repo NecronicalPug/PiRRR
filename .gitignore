@@ -1,21 +1,10 @@
-/compilation/result/
-config.ini
-output/main.exe
-test.css
-config1.ini
-/.vs/ProjectSettings.json
-/.vs
-/venv/
-/TEMP/
-*.json
-*.ini
-*.csv
-logs/
-*.xlsx
-.idea/csv-plugin.xml
 
-convert.bat
+pyuic6.exe
+
+*.json
+
+*.xlsx
 
 fart.exe
 
-pyuic6.exe
+convert.bat

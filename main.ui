@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>328</width>
-    <height>339</height>
+    <width>378</width>
+    <height>330</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +25,7 @@ color:white;
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>331</width>
+      <width>381</width>
       <height>421</height>
      </rect>
     </property>
@@ -38,7 +38,7 @@ color:white;
     <widget class="QLabel" name="label">
      <property name="geometry">
       <rect>
-       <x>25</x>
+       <x>50</x>
        <y>0</y>
        <width>291</width>
        <height>31</height>
@@ -54,7 +54,7 @@ color:white;
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>30</x>
        <y>30</y>
        <width>321</width>
        <height>31</height>
@@ -75,11 +75,18 @@ color:white;
       <rect>
        <x>10</x>
        <y>60</y>
-       <width>301</width>
-       <height>161</height>
+       <width>361</width>
+       <height>171</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="3" column="0">
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
+         <string>Select Destination File</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
        <widget class="QLabel" name="connection_status">
         <property name="text">
@@ -95,40 +102,8 @@ color:white;
         <property name="text">
          <string>None</string>
         </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>iRacing Connection Status: </string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string>Select Custom Team File</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QPushButton" name="pushButton_2">
-        <property name="text">
-         <string>Select Destination File</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="destination_file_directory">
-        <property name="text">
-         <string>results.csv</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="pushButton_3">
-        <property name="text">
-         <string>Select Results File</string>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -142,6 +117,51 @@ color:white;
         </property>
        </widget>
       </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>Select Custom Team File</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>iRacing Connection Status: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="destination_file_directory">
+        <property name="text">
+         <string>results.csv</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="pushButton_3">
+        <property name="text">
+         <string>Select Results File</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QPushButton" name="pushButton_4">
+        <property name="text">
+         <string>.CSV/.XLSX Output</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="output_type">
+        <property name="text">
+         <string>.csv</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
     <widget class="QWidget" name="gridLayoutWidget_2">
@@ -149,7 +169,7 @@ color:white;
       <rect>
        <x>10</x>
        <y>240</y>
-       <width>301</width>
+       <width>361</width>
        <height>81</height>
       </rect>
      </property>

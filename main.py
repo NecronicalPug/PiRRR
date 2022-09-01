@@ -4,6 +4,8 @@ import easygui
 import irsdk
 import json
 import csv
+import openpyxl
+
 import main_ui
 from PySide6 import QtGui, QtCore, QtWidgets
 
@@ -21,6 +23,9 @@ class ResultsReader:
 
     def set_destination_file(self, destination="results.csv"):
         self.destination_file_directory = destination
+
+    def set_output_type(self, output_type=".xlsx"):
+        self.output_type = output_type
 
     def convert_laptime(self, laptime):
         number = str(laptime)
@@ -101,17 +106,20 @@ class PreQualifyingJSONResultsReader(ResultsReader):
                             car_id)  # Tuple of relevant driver data to make it a 2D list
                     entry_data.append(temp)  # Appending the data for each entry to the array
 
-            with open(self.destination_file_directory, "w", newline='') as file:
-                writer = csv.writer(file, delimiter=";")  # CSV writer module
-                writer.writerows(entry_data)  # Writing the data to the file
-
+            if self.output_type == ".csv":
+                with open(self.destination_file_directory, "w", newline='') as file:
+                    writer = csv.writer(file, delimiter=";")  # CSV writer module
+                    writer.writerows(entry_data)  # Writing the data to the file
+            else:
+                workbook = openpyxl.Workbook()
+                worksheet = workbook.active
+                for i in entry_data:
+                    worksheet.append(i)
+                workbook.save(self.destination_file_directory)
 
 class FullJSONResultsReader(ResultsReader):
 
     def read_results(self):
-        file = open(self.destination_file_directory, "w")  # Opening file where results will be saved.
-        file.write("")
-        file.close()
 
         with open(self.source_file_name) as file:  # Opening file
             data = json.load(file)
@@ -120,18 +128,16 @@ class FullJSONResultsReader(ResultsReader):
                 everything = []
                 workaround = []  # Having to use a workaround to write a single word to the array.
                 workaround.append(i["simsession_name"])
-                header = ["Position", "Name", "Car Number", "Car", "Interval", "Fastest Lap", "Average Laps",
-                          "Laps Completed"]  # Header above all rows.
-
-                with open(self.destination_file_directory, "a",
-                          newline="") as file2:  # Opening CSV file to write session state and header row.
-                    writer = csv.writer(file2, delimiter=";")  # CSV writer module.
-                    writer.writerow(workaround)
-                    writer.writerow(header)
+                header = ["Driver ID","Position", "Name", "Car Number", "Car ID", "Interval", "Fastest Lap", "Average Laps",
+                          "Laps Completed","Team Name (if applicable)","","Old iRating", "New iRating", "iRating Change", "Old SR Level",
+                          "New SR Level", "SR Change", "Old CPI", "New CPI"]  # Header above all rows.
+                everything.append(workaround)
+                everything.append(header)
 
                 for x in i["results"]:  # Looping for each driver to read their data.
                     temparray = []
-                    name = x["display_name"]
+                    driver_id = x["cust_id"]
+                    driver_name = x["display_name"]
                     position = x["finish_position"]
                     position += 1
                     lapscomplete = x["laps_complete"]
@@ -140,24 +146,77 @@ class FullJSONResultsReader(ResultsReader):
                     bestlap = x["best_lap_time"]
                     bestlap = self.find_lap(bestlap)
                     carid = x["car_id"]
-                    carname = self.carids(carid)
+                    #carname = self.carids(carid)
                     carnumber = x["livery"]["car_number"]
                     interval = x["interval"]
                     intervalresult = self.find_interval(interval)
+                    newirating = int(x["newi_rating"])
+                    oldirating = int(x["oldi_rating"])
+                    iratingchange = newirating - oldirating
+                    newsublevel = int(x["new_sub_level"])
+                    oldsublevel = int(x["old_sub_level"])
+                    srchange = newsublevel - oldsublevel;srchange = self.format_sr_change(srchange)
+                    oldcpi = x["old_cpi"]
+                    newcpi = x["new_cpi"]
+                    temparray.append(driver_id)
                     temparray.append(position)
-                    temparray.append(name)
+                    temparray.append(driver_name)
                     temparray.append(carnumber)
-                    temparray.append(carname)
+                    temparray.append(carid)
                     temparray.append(intervalresult)
                     temparray.append(bestlap)
                     temparray.append(averagelap)
                     temparray.append(lapscomplete)  # Appending to temporary array.
+                    if not (self.source_team_file_name is None):
+                        team_name = self.find_team_name(driver_id, driver_name)
+                        temparray.append(team_name)
+                    else:
+                        temparray.append("")
+                    temparray.append("")
+                    temparray.append(oldirating)
+                    temparray.append(newirating)
+                    temparray.append(iratingchange)
+                    temparray.append(oldsublevel)
+                    temparray.append(newsublevel)
+                    temparray.append(srchange)
+                    temparray.append(oldcpi)
+                    temparray.append(newcpi)
                     everything.append(temparray)
 
-                with open(self.destination_file_directory, "a", newline="") as file2:  # Opening CSV file
-                    writer = csv.writer(file2, delimiter=";")  # CSV writer module.
-                    writer.writerows(everything)  # Writing each driver's data on a new row every time.
+                if self.output_type == ".csv":
+                    with open(self.destination_file_directory, "w", newline='') as file:
+                        writer = csv.writer(file, delimiter=";")  # CSV writer module
+                        writer.writerows(everything)  # Writing the data to the file
+                else:
+                    workbook = openpyxl.Workbook()
+                    worksheet = workbook.active
+                    for i in everything:
+                        worksheet.append(i)
+                    workbook.save(self.destination_file_directory)
 
+    def format_sr_change(self, srchange):
+        if srchange < 0:
+            if srchange > -100 and srchange <= -10:
+                srchange = str(srchange)
+                srchange = (f"-0.{srchange[1:]}")
+            elif srchange > -10:
+                srchange = str(srchange)
+                srchange = (f"-0.0{srchange[1:]}")
+
+            return srchange
+
+        elif srchange > 0:
+            srchange = str(srchange)
+            if len(srchange) == 1:
+                srchange = (f"+0.0{srchange}")
+            elif len(srchange) == 2:
+                srchange = (f"+0.{srchange}")
+            else:
+                srchange = (f"+{srchange[0]}.{srchange[1:]}")
+            return srchange
+
+        else:
+            return ("0")
 
     def carids(self, carid):  # Function to find the car make assigned to car ids in iracing.
         if carid == 43:
@@ -250,11 +309,13 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.output_file_format = ".csv"
         self.preq_json_reader = PreQualifyingJSONResultsReader()
         self.full_json_reader = FullJSONResultsReader()
         self.pushButton_3.clicked.connect(self.set_results_file_directory)
         self.pushButton.clicked.connect(self.set_team_file_directory)
         self.pushButton_2.clicked.connect(self.set_destination_file_directory)
+        self.pushButton_4.clicked.connect(self.toggle_output_type)
         self.preq_json.clicked.connect(self.run_preq_json_reader)
         self.full_json.clicked.connect(self.run_full_json_reader)
 
@@ -262,12 +323,14 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.preq_json_reader.set_source_file(str(self.results_file_directory.text()))
         self.preq_json_reader.set_team_file(str(self.team_file_directory.text()))
         self.preq_json_reader.set_destination_file(str(self.destination_file_directory.text()))
+        self.preq_json_reader.set_output_type(str(self.output_file_format))
         self.preq_json_reader.handle_results()
         
     def run_full_json_reader(self):
         self.full_json_reader.set_source_file(str(self.results_file_directory.text()))
         self.full_json_reader.set_team_file(str(self.team_file_directory.text()))
         self.full_json_reader.set_destination_file(str(self.destination_file_directory.text()))
+        self.full_json_reader.set_output_type(str(self.output_file_format))
         self.full_json_reader.read_results()
 
     def set_results_file_directory(self):
@@ -279,8 +342,22 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.team_file_directory.setText(dir)
 
     def set_destination_file_directory(self):
-        dir = easygui.filesavebox(filetypes=["*.csv"])
-        self.destination_file_directory.setText(f"{dir}.csv")
+        self.destination_file_dir = easygui.filesavebox()
+        self.destination_file_directory.setText(f"{self.destination_file_dir}{self.output_file_format}")
+
+    def toggle_output_type(self):
+        if self.output_file_format == ".csv":
+            self.output_file_format = ".xlsx"
+            self.output_type.setText(".xlsx")
+        else:
+            self.output_file_format = ".csv"
+            self.output_type.setText(".csv")
+        try:
+            self.destination_file_dir
+        except:
+            self.destination_file_directory.setText(f"results{self.output_file_format}")
+        else:
+            self.destination_file_directory.setText(f"{self.destination_file_dir}{self.output_file_format}")
 
 
 if __name__ == "__main__":
