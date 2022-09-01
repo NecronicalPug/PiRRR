@@ -1,4 +1,6 @@
 # PiRRR
+![small_PiRRR](https://user-images.githubusercontent.com/46400065/188030123-2c6e3fe4-ec3c-46bd-a4fc-a8844e73b7b5.png)
+
 Pug's iRacing Results Reader is meant to make it easier for league owners to export results from completed iRacing sessions.
 
 What does it do:
