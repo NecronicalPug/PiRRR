@@ -11,7 +11,11 @@ config1.ini
 *.ini
 *.csv
 logs/
-
 *.xlsx
-
 .idea/csv-plugin.xml
+
+convert.bat
+
+fart.exe
+
+pyuic6.exe
