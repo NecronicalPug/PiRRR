@@ -11,7 +11,10 @@ What does it do:
 
 ## Usage
 
-For both versions you can select custom team files and destination files, file extension is added automatically.
+For both versions you can select custom team files and destination files; file extensions are added automatically.
+Personally I'd recommend using the JSON versions as they offer more data and are a bit easier to read however the IRSDK version provides the same
+basic data although formatting most of it takes way too much effort for what it's worth due to inconsistencies so you'll have to excuse some of the imperfections. 
+(none are critical)
 
 ### JSON Version
 Using the iRacing UI, download the results of the session you want to read (Export results button) and choose the results file.
@@ -24,8 +27,11 @@ Here is a template for the custom team file. Team name is the key and the value 
 
 ![image](https://user-images.githubusercontent.com/46400065/187563886-e0408fc4-1763-406f-8bc9-40905bbc6fc4.png)
 
-#### Example of PreQ Version:
+#### Example of JSON PreQ Version:
 ![image](https://user-images.githubusercontent.com/46400065/187984924-08e0b227-59ab-46d6-94bf-4141a1e0b434.png)
 
-#### Example of Full Version
+#### Example of JSON Full Version
 ![image](https://user-images.githubusercontent.com/46400065/187984982-ff854a52-3504-4067-b234-b976c9730475.png)
+
+### Example of IRSDK Full Version
+![image](https://user-images.githubusercontent.com/46400065/188338504-ed183b54-c5d8-47e1-a3f6-420f0bf85810.png)
