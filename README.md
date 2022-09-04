@@ -1,20 +1,23 @@
 # PiRRR
+![small_PiRRR](https://user-images.githubusercontent.com/46400065/188030123-2c6e3fe4-ec3c-46bd-a4fc-a8844e73b7b5.png)
+
 Pug's iRacing Results Reader is meant to make it easier for league owners to export results from completed iRacing sessions.
 
 What does it do:
 - Pre-qualifying Results (Looks for qualifying session if applicable, else it uses the 1st session and it returns best lap times for each driver with car IDs to make sure no one is using the wrong car)
 - Full Results 
 - Can match drivers to the correct teams by looking for them in a list of teams if provided
+- Choice of output in .csv/.xlsx
 
 ## Usage
 
-Do note that the output is all in .csv. You will have to import it into something like Excel for it to be truly readable, which is a few clicks to do but is still extra effort.
+For both versions you can select custom team files and destination files, file extension is added automatically.
 
 ### JSON Version
-Using the iRacing UI, download the results of the session you want to read (Export results button). Run the application and provide the directories of your custom team file and the destination of the results file (optional)
+Using the iRacing UI, download the results of the session you want to read (Export results button) and choose the results file.
 
 ### iRSDK Version
-Joining a session and pressing the export results button with the custom team file and destination name directories (optional) will return the same results.
+Joining a session and pressing the IRSDK button while iRacing connection status says True exports results.
 
 ### Custom Team File
 Here is a template for the custom team file. Team name is the key and the value is an array of driver names (use display names for the particular session you're in).
