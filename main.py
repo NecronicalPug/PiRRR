@@ -122,10 +122,10 @@ class FullJSONResultsReader(ResultsReader):
     def read_results(self):
 
         with open(self.source_file_name) as file:  # Opening file
+            everything = []
             data = json.load(file)
             sessionresultsdata = data["session_results"]  # Reading just the session_results out of everything
             for i in sessionresultsdata:
-                everything = []
                 workaround = []  # Having to use a workaround to write a single word to the array.
                 workaround.append(i["simsession_name"])
                 header = ["Driver ID","Position", "Name", "Car Number", "Car ID", "Interval", "Fastest Lap", "Average Laps",
@@ -134,6 +134,7 @@ class FullJSONResultsReader(ResultsReader):
                 everything.append(workaround)
                 everything.append(header)
 
+                self.leader_laps_complete = i["results"][0]["laps_complete"]
                 for x in i["results"]:  # Looping for each driver to read their data.
                     temparray = []
                     driver_id = x["cust_id"]
@@ -149,7 +150,7 @@ class FullJSONResultsReader(ResultsReader):
                     #carname = self.carids(carid)
                     carnumber = x["livery"]["car_number"]
                     interval = x["interval"]
-                    intervalresult = self.find_interval(interval)
+                    intervalresult = self.find_interval(interval, lapscomplete)
                     newirating = int(x["newi_rating"])
                     oldirating = int(x["oldi_rating"])
                     iratingchange = newirating - oldirating
@@ -183,16 +184,16 @@ class FullJSONResultsReader(ResultsReader):
                     temparray.append(newcpi)
                     everything.append(temparray)
 
-                if self.output_type == ".csv":
-                    with open(self.destination_file_directory, "w", newline='') as file:
-                        writer = csv.writer(file, delimiter=";")  # CSV writer module
-                        writer.writerows(everything)  # Writing the data to the file
-                else:
-                    workbook = openpyxl.Workbook()
-                    worksheet = workbook.active
-                    for i in everything:
-                        worksheet.append(i)
-                    workbook.save(self.destination_file_directory)
+            if self.output_type == ".csv":
+                with open(self.destination_file_directory, "w", newline='') as file:
+                    writer = csv.writer(file, delimiter=";")  # CSV writer module
+                    writer.writerows(everything)  # Writing the data to the file
+            else:
+                workbook = openpyxl.Workbook()
+                worksheet = workbook.active
+                for i in everything:
+                    worksheet.append(i)
+                workbook.save(self.destination_file_directory)
 
     def format_sr_change(self, srchange):
         if srchange < 0:
@@ -203,20 +204,20 @@ class FullJSONResultsReader(ResultsReader):
                 srchange = str(srchange)
                 srchange = (f"-0.0{srchange[1:]}")
 
-            return srchange
+            return float(srchange)
 
         elif srchange > 0:
             srchange = str(srchange)
             if len(srchange) == 1:
-                srchange = (f"+0.0{srchange}")
+                srchange = (f"0.0{srchange}")
             elif len(srchange) == 2:
-                srchange = (f"+0.{srchange}")
+                srchange = (f"0.{srchange}")
             else:
-                srchange = (f"+{srchange[0]}.{srchange[1:]}")
-            return srchange
+                srchange = (f"{srchange[0]}.{srchange[1:]}")
+            return float(srchange)
 
         else:
-            return ("0")
+            return (0)
 
     def carids(self, carid):  # Function to find the car make assigned to car ids in iracing.
         if carid == 43:
@@ -237,7 +238,7 @@ class FullJSONResultsReader(ResultsReader):
             return ("Error")
 
     def find_interval(self,
-                      number):  # Used to determine what the interval will be like, sucks that it's so complicated.
+                      number, laps_completed):  # Used to determine what the interval will be like, sucks that it's so complicated.
         number = str(number)
         if len(number) == 4:
             seconds = 0;
@@ -274,7 +275,8 @@ class FullJSONResultsReader(ResultsReader):
             if int(number) == 0:
                 return "Leader"
             elif int(number) < 0:
-                return (f'{number} laps')
+                laps_down = self.leader_laps_complete - laps_completed
+                return (f'{laps_down} laps')
         else:
             return "Error"
 
