@@ -47,5 +47,7 @@ Here is a template for the custom team file. Team name is the key and the value 
 
 ## Modifications
 If you'd like to modify the code, download the source code and run the following in Windows Terminal:
-```pip install -r requirements.txt```
-Source code was written via PyCharm on Python 3.10.
+```
+pip install -r requirements.txt
+```
+Source code was written with PyCharm on Python 3.10.
