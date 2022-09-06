@@ -10,6 +10,7 @@ What does it do:
 - Choice of output in .csv/.xlsx
 
 ## Usage
+Simply download and run the .exe in Releases.
 
 For both versions you can select custom team files and destination files; file extensions are added automatically.
 Personally I'd recommend using the JSON versions as they offer more data and are a bit easier to read however the IRSDK version provides the same
@@ -42,3 +43,9 @@ Here is a template for the custom team file. Team name is the key and the value 
 
 ### Example of IRSDK Full Version
 ![image](https://user-images.githubusercontent.com/46400065/188338504-ed183b54-c5d8-47e1-a3f6-420f0bf85810.png)
+
+
+## Modifications
+If you'd like to modify the code, download the source code and run the following in Windows Terminal:
+```pip install -r requirements.txt```
+Source code was written via PyCharm on Python 3.10.
