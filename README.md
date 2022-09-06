@@ -26,6 +26,7 @@ Joining a session and pressing the IRSDK button while iRacing connection status 
 PreQ Version - Takes the session you're currently in and data up to right now.
 Full Version - Takes all the sessions and data up to right now.
 
+![image](https://user-images.githubusercontent.com/46400065/188758763-4a596b72-296f-40f6-8542-9ea9372e52d5.png)
 
 ### Custom Team File
 Here is a template for the custom team file. Team name is the key and the value is an array of driver names (use display names for the particular session you're in).
