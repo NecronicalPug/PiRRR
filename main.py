@@ -77,7 +77,6 @@ class ResultsReader:
         with open(self.source_team_file_name) as file:
             self.team_file_data = json.load(file)
 
-
     def format_sr_change(self, srchange):
         if srchange < 0:
             if srchange > -100 and srchange <= -10:
@@ -135,7 +134,8 @@ class ResultsReader:
             return ("Error")
 
     def find_interval(self,
-                      number, laps_completed):  # Used to determine what the interval will be like, sucks that it's so complicated.
+                      number,
+                      laps_completed):  # Used to determine what the interval will be like, sucks that it's so complicated.
         number = str(number)
         if len(number) == 4:
             seconds = 0;
@@ -209,7 +209,7 @@ class PreQualifyingJSONResultsReader(ResultsReader):
                 file_data = json.load(file)  # Reading json file
                 entry_data = [(f"{file_data['subsession_id']}", f"{file_data['track']['track_name']}",
                                f"{file_data['track']['config_name']}"),
-                                ("Driver ID", "Driver Name", "Best Lap Time",
+                              ("Driver ID", "Driver Name", "Best Lap Time",
                                "Car ID",
                                "Team Name (if applicable)")]  # Creating an empty array to store the data for each entry
                 session_results_data = file_data["session_results"]  # Focusing only on session results section
@@ -239,8 +239,8 @@ class PreQualifyingJSONResultsReader(ResultsReader):
                             car_id)  # Tuple of relevant driver data to make it a 2D list
                     entry_data.append(temp)  # Appending the data for each entry to the array
 
-
             self.write_to_file(entry_data)
+
 
 class FullJSONResultsReader(ResultsReader):
 
@@ -251,13 +251,15 @@ class FullJSONResultsReader(ResultsReader):
             data = json.load(file)
             sessionresultsdata = data["session_results"]  # Reading just the session_results out of everything
             first_header = (f"{data['subsession_id']}", f"{data['track']['track_name']}",
-                               f"{data['track']['config_name']}")
+                            f"{data['track']['config_name']}")
             everything.append(first_header)
             for i in sessionresultsdata:
                 workaround = []  # Having to use a workaround to write a single word to the array.
                 workaround.append(i["simsession_name"])
-                header = ["Driver ID","Position", "Name", "Car Number", "Car ID", "Interval", "Fastest Lap", "Average Laps",
-                          "Laps Completed","Incidents","Team Name (if applicable)","","Old iRating", "New iRating", "iRating Change", "Old SR Level",
+                header = ["Driver ID", "Position", "Name", "Car Number", "Car ID", "Interval", "Fastest Lap",
+                          "Average Laps",
+                          "Laps Completed", "Incidents", "Team Name (if applicable)", "", "Old iRating", "New iRating",
+                          "iRating Change", "Old SR Level",
                           "New SR Level", "SR Change", "Old CPI", "New CPI"]  # Header above all rows.
                 everything.append(workaround)
                 everything.append(header)
@@ -275,7 +277,7 @@ class FullJSONResultsReader(ResultsReader):
                     bestlap = x["best_lap_time"]
                     bestlap = self.find_lap(bestlap)
                     carid = x["car_id"]
-                    #carname = self.carids(carid)
+                    # carname = self.carids(carid)
                     carnumber = x["livery"]["car_number"]
                     interval = x["interval"]
                     intervalresult = self.find_interval(interval, lapscomplete)
@@ -286,7 +288,8 @@ class FullJSONResultsReader(ResultsReader):
                     licenseclass = self.find_license_class(x["new_license_level"])
                     newsublevel = int(x["new_sub_level"])
                     oldsublevel = int(x["old_sub_level"])
-                    srchange = newsublevel - oldsublevel;srchange = self.format_sr_change(srchange)
+                    srchange = newsublevel - oldsublevel;
+                    srchange = self.format_sr_change(srchange)
                     newsublevel = f"{licenseclass}{newsublevel}"
                     oldsublevel = f"{licenseclass}{oldsublevel}"
                     oldcpi = x["old_cpi"]
@@ -319,6 +322,71 @@ class FullJSONResultsReader(ResultsReader):
 
         self.write_to_file(everything)
 
+
+class PreQualifyingIRSDKResultsReader(ResultsReader):
+
+    def __init__(self, irsdk):
+        self.irsdk = irsdk
+
+    def read_results(self):
+        print(True)
+        everything = []
+        first_header = (f"{self.irsdk['WeekendInfo']['SessionID']}", f"{self.irsdk['WeekendInfo']['TrackDisplayName']}")
+        everything.append(first_header)
+        sessionresultsdata = self.irsdk["SessionInfo"]["Sessions"]
+        driverdata = self.irsdk["DriverInfo"]["Drivers"]
+        sessionnum = self.irsdk["SessionNum"]
+        i = sessionresultsdata[sessionnum]
+        workaround = []
+        workaround.append(i["SessionName"])
+        header = ("Driver ID", "Name", "Fastest Lap", "Car Name",
+                  "Team Name (if applicable)")
+        everything.append(workaround)
+        everything.append(header)
+        print(True)
+        for x in i["ResultsPositions"]:
+            temparray = []
+            caridx = x["CarIdx"]
+            driver_id = driverdata[caridx]["UserID"]
+            driver_name = driverdata[caridx]["TeamName"]
+            bestlap = x["FastestTime"]
+            bestlap = self.find_lap(bestlap)
+            carname = driverdata[caridx]["CarScreenName"]
+            temparray.append(driver_id)
+            temparray.append(driver_name)
+            temparray.append(bestlap)
+            temparray.append(carname)
+            if not (self.source_team_file_name is None):
+                team_name = self.find_team_name(driver_name)
+                temparray.append(team_name)
+            else:
+                temparray.append("")
+            everything.append(temparray)
+        print(everything)
+        self.write_to_file(everything)
+
+    def find_interval(self, laptime):
+        interval = laptime - self.leader_best_lap
+        if interval > 60:
+            minutes = interval // 60
+            seconds = interval % 60
+            if seconds < 10:
+                seconds = f"0{round(seconds, 3)}"
+            return f"{int(minutes)}:{seconds}"
+        else:
+            return f"{round(interval, 3)}"
+
+    def find_lap(self, time):
+        if time > 60:
+            minutes = time // 60
+            seconds = time % 60
+            if seconds < 10:
+                seconds = f"0{round(seconds, 4)}"
+            return f"{int(minutes)}:{seconds}"
+        else:
+            return f"{time}"
+
+
 class FullIRSDKResultsReader(ResultsReader):
 
     def __init__(self, irsdk):
@@ -334,7 +402,7 @@ class FullIRSDKResultsReader(ResultsReader):
             workaround = []
             workaround.append(i["SessionName"])
             header = ("Driver ID", "Position", "Name", "Car Number", "Car Name", "Interval", "Fastest Lap",
-                      "Laps Completed", "Incidents", "Team Name (if applicable)","","iRating","SR Level")
+                      "Laps Completed", "Incidents", "Team Name (if applicable)", "", "iRating", "SR Level")
             everything.append(workaround)
             everything.append(header)
             self.leader_time = i["ResultsPositions"][0]["Time"]
@@ -378,8 +446,7 @@ class FullIRSDKResultsReader(ResultsReader):
 
         self.write_to_file(everything)
 
-
-    def find_interval(self, time, lapscomplete, sessionname, laptime = None):
+    def find_interval(self, time, lapscomplete, sessionname, laptime=None):
         if sessionname == "QUALIFY" or sessionname == "PRACTICE":
             return float(laptime) - float(self.leader_best_lap)
         if lapscomplete == self.leader_laps_completed:
@@ -419,6 +486,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.irsdk_timer.start(5000)
         self.preq_json_reader = PreQualifyingJSONResultsReader()
         self.full_json_reader = FullJSONResultsReader()
+        self.preq_irsdk_reader = PreQualifyingIRSDKResultsReader(self.IRSDK)
         self.full_irsdk_reader = FullIRSDKResultsReader(self.IRSDK)
         self.pushButton_3.clicked.connect(self.set_results_file_directory)
         self.pushButton.clicked.connect(self.set_team_file_directory)
@@ -426,6 +494,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.pushButton_4.clicked.connect(self.toggle_output_type)
         self.preq_json.clicked.connect(self.run_preq_json_reader)
         self.full_json.clicked.connect(self.run_full_json_reader)
+        self.preq_irsdk.clicked.connect(self.run_preq_irsdk_reader)
         self.full_irsdk.clicked.connect(self.run_full_irsdk_reader)
         self.iracing_connection = False
 
@@ -436,7 +505,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             self.preq_json_reader.set_destination_file(str(self.destination_file_directory.text()))
             self.preq_json_reader.set_output_type(str(self.output_file_format))
             self.preq_json_reader.handle_results()
-        
+
     def run_full_json_reader(self):
         if self.results_file_directory.text() != "None":
             self.full_json_reader.set_source_file(str(self.results_file_directory.text()))
@@ -444,16 +513,23 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             self.full_json_reader.set_destination_file(str(self.destination_file_directory.text()))
             self.full_json_reader.set_output_type(str(self.output_file_format))
             self.full_json_reader.read_results()
-        
+            
+    def run_preq_irsdk_reader(self):
+        if self.iracing_connection is True:
+            self.preq_irsdk_reader.set_team_file(str(self.team_file_directory.text()))
+            self.preq_irsdk_reader.set_destination_file(str(self.destination_file_directory.text()))
+            self.preq_irsdk_reader.set_output_type(str(self.output_file_format))
+            self.preq_irsdk_reader.read_results()
+        else:
+            pass
+
     def run_full_irsdk_reader(self):
         if self.iracing_connection is True:
             self.full_irsdk_reader.set_team_file(str(self.team_file_directory.text()))
             self.full_irsdk_reader.set_destination_file(str(self.destination_file_directory.text()))
             self.full_irsdk_reader.set_output_type(str(self.output_file_format))
             self.full_irsdk_reader.read_results()
-            print(True)
         else:
-            print(False)
             pass
 
     def set_results_file_directory(self):
@@ -481,7 +557,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             self.destination_file_directory.setText(f"results{self.output_file_format}")
         else:
             self.destination_file_directory.setText(f"{self.destination_file_dir}{self.output_file_format}")
-            
+
     def check_for_iracing_connection(self):
         if self.iracing_connection and not (
                 self.IRSDK.is_initialized and self.IRSDK.is_connected):  # If connection is lost
@@ -495,7 +571,6 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             self.iracing_connection = True
             self.IRSDK.startup()
             self.connection_status.setText("True")
-
 
 
 if __name__ == "__main__":
