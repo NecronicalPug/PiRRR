@@ -5,7 +5,7 @@ Pug's iRacing Results Reader is meant to make it easier for league owners to exp
 
 What does it do:
 - Pre-qualifying Results (JSON Version = Looks for quali session else it takes the 1st session, IRSDK Version = Takes current session)
-- Full Results (Goes through all sessions and exports 
+- Full Results (Goes through all sessions and exports most of the relevant data)
 - Can match drivers to the correct teams by looking for them in a list of teams if provided
 - Choice of output in .csv/.xlsx
 
