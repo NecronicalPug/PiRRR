@@ -13,14 +13,16 @@ What does it do:
 
 For both versions you can select custom team files and destination files; file extensions are added automatically.
 Personally I'd recommend using the JSON versions as they offer more data and are a bit easier to read however the IRSDK version provides the same
-basic data although formatting most of it takes way too much effort for what it's worth due to inconsistencies so you'll have to excuse some of the imperfections. 
-(none are critical)
+data although there may be formatting imperfections (e.g. 2:03.45 is = 2:03.450, 2:03.3 = 2:03.300).
 
 ### JSON Version
-Using the iRacing UI, download the results of the session you want to read (Export results button) and choose the results file.
+Using the iRacing UI, download the results of the session you want to read (Export results button in the iRacing UI) and choose the results file.
 
 ### iRSDK Version
 Joining a session and pressing the IRSDK button while iRacing connection status says True exports results.
+PreQ Version - Takes the session you're currently in and data up to right now.
+Full Version - Takes all the sessions and data up to right now.
+
 
 ### Custom Team File
 Here is a template for the custom team file. Team name is the key and the value is an array of driver names (use display names for the particular session you're in).
@@ -28,10 +30,13 @@ Here is a template for the custom team file. Team name is the key and the value 
 ![image](https://user-images.githubusercontent.com/46400065/187563886-e0408fc4-1763-406f-8bc9-40905bbc6fc4.png)
 
 #### Example of JSON PreQ Version:
-![image](https://user-images.githubusercontent.com/46400065/187984924-08e0b227-59ab-46d6-94bf-4141a1e0b434.png)
+![image](https://user-images.githubusercontent.com/46400065/188755581-5fc7d4d3-f810-4072-b1d1-ca56c1c0da4e.png)
 
 #### Example of JSON Full Version
-![image](https://user-images.githubusercontent.com/46400065/187984982-ff854a52-3504-4067-b234-b976c9730475.png)
+![image](https://user-images.githubusercontent.com/46400065/188755663-484f6abc-f665-4654-bfa6-c41618c154a0.png)
+
+### Example of IRSDK PreQ Version:
+![image](https://user-images.githubusercontent.com/46400065/188755753-116521db-97cc-4350-a9b9-7cf691815a94.png)
 
 ### Example of IRSDK Full Version
 ![image](https://user-images.githubusercontent.com/46400065/188338504-ed183b54-c5d8-47e1-a3f6-420f0bf85810.png)
