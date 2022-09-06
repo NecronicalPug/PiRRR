@@ -50,4 +50,4 @@ If you'd like to modify the code, download the source code and run the following
 ```
 pip install -r requirements.txt
 ```
-Source code was written via PyCharm on Python 3.10.
+Source code was written with PyCharm on Python 3.10.
