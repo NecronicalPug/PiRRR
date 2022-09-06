@@ -4,8 +4,8 @@
 Pug's iRacing Results Reader is meant to make it easier for league owners to export results from completed iRacing sessions.
 
 What does it do:
-- Pre-qualifying Results (Looks for qualifying session if applicable, else it uses the 1st session and it returns best lap times for each driver with car IDs to make sure no one is using the wrong car)
-- Full Results 
+- Pre-qualifying Results (JSON Version = Looks for quali session else it takes the 1st session, IRSDK Version = Takes current session)
+- Full Results (Goes through all sessions and exports 
 - Can match drivers to the correct teams by looking for them in a list of teams if provided
 - Choice of output in .csv/.xlsx
 
@@ -17,6 +17,8 @@ data although there may be formatting imperfections (e.g. 2:03.45 is = 2:03.450,
 
 ### JSON Version
 Using the iRacing UI, download the results of the session you want to read (Export results button in the iRacing UI) and choose the results file.
+PreQ Version = Looks for qualifying session, else it uses the 1st session
+Full Version = Takes all sessions
 
 ### iRSDK Version
 Joining a session and pressing the IRSDK button while iRacing connection status says True exports results.
