@@ -12,9 +12,9 @@ What does it do:
 ## Usage
 Simply download and run the .exe in Releases.
 
-For both versions you can select custom team files and destination files; file extensions are added automatically.
+For all three versions you can select custom team files and destination files; file extensions are added automatically.
 Personally I'd recommend using the JSON versions as they offer more data and are a bit easier to read however the IRSDK version provides the same
-data although there may be formatting imperfections (e.g. 2:03.45 is = 2:03.450, 2:03.3 = 2:03.300).
+data although there are formatting imperfections that may show up.
 
 ### JSON Version
 Using the iRacing UI, download the results of the session you want to read (Export results button in the iRacing UI) and choose the results file.
@@ -25,6 +25,12 @@ Full Version = Takes all sessions
 Joining a session and pressing the IRSDK button while iRacing connection status says True exports results.
 PreQ Version - Takes the session you're currently in and data up to right now.
 Full Version - Takes all the sessions and data up to right now.
+
+### /data API Version
+By providing your iRacing login details and the desired session ID, you can fetch the session results via the iRacing website instead of manually exporting them
+from the iRacing UI. No login details are stored once the app is closed, the cookies file is used to reduce login attempts to the website.
+
+It is the JSON version without the manual results fetching.
 
 ![image](https://user-images.githubusercontent.com/46400065/188758763-4a596b72-296f-40f6-8542-9ea9372e52d5.png)
 
