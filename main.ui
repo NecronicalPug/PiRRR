@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>378</width>
-    <height>330</height>
+    <height>529</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@ color:white;
       <x>0</x>
       <y>0</y>
       <width>381</width>
-      <height>421</height>
+      <height>531</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -80,10 +80,10 @@ color:white;
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="3" column="0">
-       <widget class="QPushButton" name="pushButton_2">
+      <item row="4" column="0">
+       <widget class="QPushButton" name="pushButton_4">
         <property name="text">
-         <string>Select Destination File</string>
+         <string>.CSV/.XLSX Output (ALL)</string>
         </property>
        </widget>
       </item>
@@ -107,27 +107,17 @@ color:white;
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="results_file_directory">
-        <property name="text">
-         <string>None</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0">
        <widget class="QPushButton" name="pushButton">
         <property name="text">
-         <string>Select Custom Team File</string>
+         <string>Select Custom Team File (ALL)</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
+      <item row="3" column="0">
+       <widget class="QPushButton" name="pushButton_2">
         <property name="text">
-         <string>iRacing Connection Status: </string>
+         <string>Select Destination File (ALL)</string>
         </property>
        </widget>
       </item>
@@ -141,20 +131,6 @@ color:white;
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="pushButton_3">
-        <property name="text">
-         <string>Select Results File</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QPushButton" name="pushButton_4">
-        <property name="text">
-         <string>.CSV/.XLSX Output</string>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="1">
        <widget class="QLabel" name="output_type">
         <property name="text">
@@ -162,15 +138,154 @@ color:white;
         </property>
        </widget>
       </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>iRacing Connection Status: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="pushButton_3">
+        <property name="text">
+         <string>Select Results File (JSON)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="results_file_directory">
+        <property name="text">
+         <string>None</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
+    </widget>
+    <widget class="QWidget" name="gridLayoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>370</y>
+       <width>361</width>
+       <height>146</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="0">
+       <widget class="QPushButton" name="set_password">
+        <property name="text">
+         <string>Set iRacing Password</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="iracing_username">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Normal</enum>
+        </property>
+        <property name="placeholderText">
+         <string>None</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="set_session_id">
+        <property name="text">
+         <string>Set Session ID</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="set_username">
+        <property name="text">
+         <string>Set iRacing Username/Email</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="session_id">
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Normal</enum>
+        </property>
+        <property name="placeholderText">
+         <string>None</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QPushButton" name="fetch_results">
+        <property name="text">
+         <string>Only Fetch Results</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="iracing_password">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>None</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QPushButton" name="preq_json_3">
+        <property name="text">
+         <string>PreQ Version</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QPushButton" name="full_json_2">
+        <property name="text">
+         <string>Full Version</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>330</y>
+       <width>321</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 20px;</string>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;iRacing /DATA API&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
     </widget>
     <widget class="QWidget" name="gridLayoutWidget_2">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>240</y>
+       <y>250</y>
        <width>361</width>
-       <height>81</height>
+       <height>71</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">

@@ -12,7 +12,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
+import os
 import sys
 import easygui
 import irsdk
@@ -20,6 +20,10 @@ import json
 import csv
 import openpyxl
 import main_ui
+import requests
+import hashlib
+import base64
+from http.cookiejar import LWPCookieJar
 from PySide6 import QtGui, QtCore, QtWidgets
 
 
@@ -220,16 +224,18 @@ class PreQualifyingJSONResultsReader(ResultsReader):
         if not (self.source_file_name is None):
             with open(self.source_file_name) as file:
                 file_data = json.load(file)  # Reading json file
-                entry_data = [(f"{file_data['subsession_id']}", f"{file_data['track']['track_name']}",
-                               f"{file_data['track']['config_name']}"),
-                              ("Driver ID", "Driver Name", "Best Lap Time",
-                               "Car ID",
-                               "Team Name (if applicable)")]  # Creating an empty array to store the data for each entry
                 session_results_data = file_data["session_results"]  # Focusing only on session results section
                 if session_results_data[1]["simsession_name"] == "QUALIFY":  # Pre-qualifying is typically in Qualifying
                     target_session_number = 1
                 else:  # If qualifying didn't occur in your session, then take practice instead.
                     target_session_number = 0
+
+                entry_data = [(f"{file_data['subsession_id']}", f"{file_data['track']['track_name']}",
+                               f"{file_data['track']['config_name']}",
+                               f"{session_results_data[target_session_number]['simsession_name']}"),
+                              ("Driver ID", "Driver Name", "Best Lap Time",
+                               "Car ID",
+                               "Team Name (if applicable)")]  # Creating an empty array to store the data for each entry
 
                 target_session_data = session_results_data[
                     target_session_number]  # Focusing on the pre-qualifying session
@@ -342,7 +348,6 @@ class PreQualifyingIRSDKResultsReader(ResultsReader):
         self.irsdk = irsdk
 
     def read_results(self):
-        print(True)
         everything = []
         first_header = (f"{self.irsdk['WeekendInfo']['SessionID']}", f"{self.irsdk['WeekendInfo']['TrackDisplayName']}")
         everything.append(first_header)
@@ -356,7 +361,6 @@ class PreQualifyingIRSDKResultsReader(ResultsReader):
                   "Team Name (if applicable)")
         everything.append(workaround)
         everything.append(header)
-        print(True)
         for x in i["ResultsPositions"]:
             temparray = []
             caridx = x["CarIdx"]
@@ -375,7 +379,6 @@ class PreQualifyingIRSDKResultsReader(ResultsReader):
             else:
                 temparray.append("")
             everything.append(temparray)
-        print(everything)
         self.write_to_file(everything)
 
     def find_interval(self, laptime):
@@ -487,6 +490,59 @@ class FullIRSDKResultsReader(ResultsReader):
             return f"{time}"
 
 
+class iRDataClientButBetter:
+    def __init__(self, username=None, password=None, cookie_file=None):
+        self.authenticated = False
+        self.session = requests.Session()
+        self.base_url = "https://members-ng.iracing.com"
+        self.cookie_file = cookie_file
+
+        self.username = username
+        self.encoded_password = None
+
+    def encode_password(self, username, password):
+        try:
+            initial_hash = hashlib.sha256((password + username.lower()).encode('utf-8')).digest()
+            self.encoded_password = base64.b64encode(initial_hash).decode('utf-8')
+        except Exception as ex:
+            print(ex)
+
+    def login(self):
+        if self.cookie_file:
+            self.session.cookies = LWPCookieJar(self.cookie_file)
+            if not os.path.exists(self.cookie_file):
+                self.session.cookies.save()
+            else:
+                self.session.cookies.load(ignore_discard=True)
+        headers = {'Content-Type': 'application/json'}
+        data = {"email": self.username, "password": self.encoded_password}
+
+        try:
+            r = self.session.post('https://members-ng.iracing.com/auth', headers=headers, json=data, timeout=5.0)
+        except requests.Timeout:
+            raise RuntimeError("Login timed out")
+        except requests.ConnectionError:
+            raise RuntimeError("Connection error")
+        else:
+            response_data = r.json()
+            if r.status_code == 200 and response_data['authcode']:
+                if self.cookie_file:
+                    self.session.cookies.save(ignore_discard=True)
+                self.authenticated = True
+                return "Logged in"
+            else:
+                raise RuntimeError("Error from iRacing: ", response_data)
+
+    def fetch_session(self, session_id):
+        return self.dump_session(
+            self.session.get(f"https://members-ng.iracing.com/data/results/get?subsession_id={session_id}"))
+
+    def dump_session(self, session):
+        results = requests.get(session.json()["link"])
+        with open("results.json", "w") as f:
+            json.dump(results.json(), f)
+
+
 class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
 
     def __init__(self):
@@ -501,6 +557,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.full_json_reader = FullJSONResultsReader()
         self.preq_irsdk_reader = PreQualifyingIRSDKResultsReader(self.IRSDK)
         self.full_irsdk_reader = FullIRSDKResultsReader(self.IRSDK)
+        self.api_client = iRDataClientButBetter(cookie_file="cookies.txt")
         self.pushButton_3.clicked.connect(self.set_results_file_directory)
         self.pushButton.clicked.connect(self.set_team_file_directory)
         self.pushButton_2.clicked.connect(self.set_destination_file_directory)
@@ -509,6 +566,12 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.full_json.clicked.connect(self.run_full_json_reader)
         self.preq_irsdk.clicked.connect(self.run_preq_irsdk_reader)
         self.full_irsdk.clicked.connect(self.run_full_irsdk_reader)
+        self.set_username.clicked.connect(self.set_iracing_username)
+        self.set_password.clicked.connect(self.set_iracing_password)
+        self.set_session_id.clicked.connect(self.set_iracing_session_id)
+        self.fetch_results.clicked.connect(self.api_fetch_results)
+        self.preq_json_3.clicked.connect(self.run_preq_api_reader)
+        self.full_json_2.clicked.connect(self.run_full_api_reader)
         self.iracing_connection = False
 
     def run_preq_json_reader(self):
@@ -526,7 +589,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             self.full_json_reader.set_destination_file(str(self.destination_file_directory.text()))
             self.full_json_reader.set_output_type(str(self.output_file_format))
             self.full_json_reader.read_results()
-            
+
     def run_preq_irsdk_reader(self):
         if self.iracing_connection is True:
             self.preq_irsdk_reader.set_team_file(str(self.team_file_directory.text()))
@@ -545,6 +608,39 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         else:
             pass
 
+    def api_fetch_results(self):
+        try:
+            if self.api_client.username is not None and self.api_client.encoded_password is not None and self.session_id is not None:
+                self.api_client.login()
+                self.api_client.fetch_session(self.session_id)
+        except Exception as ex:
+            print(ex)
+            pass
+
+    def run_preq_api_reader(self):
+        self.api_fetch_results()
+        try:
+            self.preq_json_reader.set_source_file("results.json")
+            self.preq_json_reader.set_team_file(str(self.team_file_directory.text()))
+            self.preq_json_reader.set_destination_file(str(self.destination_file_directory.text()))
+            self.preq_json_reader.set_output_type(str(self.output_file_format))
+            self.preq_json_reader.handle_results()
+        except Exception as ex:
+            print(ex)
+            pass
+
+    def run_full_api_reader(self):
+        self.api_fetch_results()
+        try:
+            self.full_json_reader.set_source_file("results.json")
+            self.full_json_reader.set_team_file(str(self.team_file_directory.text()))
+            self.full_json_reader.set_destination_file(str(self.destination_file_directory.text()))
+            self.full_json_reader.set_output_type(str(self.output_file_format))
+            self.full_json_reader.read_results()
+        except Exception as ex:
+            print(ex)
+            pass
+
     def set_results_file_directory(self):
         dir = easygui.fileopenbox(filetypes=["*.json"])
         self.results_file_directory.setText(dir)
@@ -556,6 +652,15 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
     def set_destination_file_directory(self):
         self.destination_file_dir = easygui.filesavebox()
         self.destination_file_directory.setText(f"{self.destination_file_dir}{self.output_file_format}")
+
+    def set_iracing_username(self):
+        self.api_client.username = self.iracing_username.text()
+
+    def set_iracing_password(self):
+        self.api_client.encode_password(self.api_client.username, self.iracing_password.text())
+
+    def set_iracing_session_id(self):
+        self.session_id = self.session_id.text()
 
     def toggle_output_type(self):
         if self.output_file_format == ".csv":
