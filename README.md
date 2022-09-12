@@ -32,7 +32,8 @@ from the iRacing UI. No login details are stored once the app is closed, the coo
 
 It is the JSON version without the manual results fetching.
 
-![image](https://user-images.githubusercontent.com/46400065/188758763-4a596b72-296f-40f6-8542-9ea9372e52d5.png)
+![image](https://user-images.githubusercontent.com/46400065/189555254-3073476e-1c21-4b87-9242-3fc129440c49.png)
+
 
 ### Custom Team File
 Here is a template for the custom team file. Team name is the key and the value is an array of driver names (use display names for the particular session you're in).
