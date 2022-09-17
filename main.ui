@@ -174,13 +174,6 @@ color:white;
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="1" column="0">
-       <widget class="QPushButton" name="set_password">
-        <property name="text">
-         <string>Set iRacing Password</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
        <widget class="QLineEdit" name="iracing_username">
         <property name="text">
@@ -190,21 +183,14 @@ color:white;
          <enum>QLineEdit::Normal</enum>
         </property>
         <property name="placeholderText">
-         <string>None</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="set_session_id">
-        <property name="text">
-         <string>Set Session ID</string>
+         <string>Email</string>
         </property>
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QPushButton" name="set_username">
+       <widget class="QPushButton" name="set_credentials">
         <property name="text">
-         <string>Set iRacing Username/Email</string>
+         <string>Set iRacing Credentials</string>
         </property>
        </widget>
       </item>
@@ -220,7 +206,7 @@ color:white;
          <enum>QLineEdit::Normal</enum>
         </property>
         <property name="placeholderText">
-         <string>None</string>
+         <string>Session ID</string>
         </property>
        </widget>
       </item>
@@ -240,7 +226,7 @@ color:white;
          <enum>QLineEdit::Password</enum>
         </property>
         <property name="placeholderText">
-         <string>None</string>
+         <string>Password</string>
         </property>
        </widget>
       </item>

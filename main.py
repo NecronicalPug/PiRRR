@@ -23,6 +23,7 @@ import main_ui
 import requests
 import hashlib
 import base64
+import keyring
 from http.cookiejar import LWPCookieJar
 from PySide6 import QtGui, QtCore, QtWidgets
 
@@ -491,21 +492,25 @@ class FullIRSDKResultsReader(ResultsReader):
 
 
 class iRDataClientButBetter:
-    def __init__(self, username=None, password=None, cookie_file=None):
+    def __init__(self, cookie_file=None):
         self.authenticated = False
         self.session = requests.Session()
         self.base_url = "https://members-ng.iracing.com"
         self.cookie_file = cookie_file
 
-        self.username = username
-        self.encoded_password = None
+        self.username = keyring.get_password("PiRRR Email", os.getlogin())
+        self.credentials_container = keyring.get_credential("PiRRR Password", os.getlogin())  # Username = Windows Username
+        if self.credentials_container is None:
+            self.encoded_password = None
+        else:
+            self.encoded_password = self.credentials_container.password
 
     def encode_password(self, username, password):
         try:
             initial_hash = hashlib.sha256((password + username.lower()).encode('utf-8')).digest()
             self.encoded_password = base64.b64encode(initial_hash).decode('utf-8')
         except Exception as ex:
-            print(ex)
+            self.encoded_password = None
 
     def login(self):
         if self.cookie_file:
@@ -541,6 +546,7 @@ class iRDataClientButBetter:
         results = requests.get(session.json()["link"])
         with open("results.json", "w") as f:
             json.dump(results.json(), f)
+        return True
 
 
 class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
@@ -566,9 +572,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.full_json.clicked.connect(self.run_full_json_reader)
         self.preq_irsdk.clicked.connect(self.run_preq_irsdk_reader)
         self.full_irsdk.clicked.connect(self.run_full_irsdk_reader)
-        self.set_username.clicked.connect(self.set_iracing_username)
-        self.set_password.clicked.connect(self.set_iracing_password)
-        self.set_session_id.clicked.connect(self.set_iracing_session_id)
+        self.set_credentials.clicked.connect(self.set_iracing_credentials)
         self.fetch_results.clicked.connect(self.api_fetch_results)
         self.preq_json_3.clicked.connect(self.run_preq_api_reader)
         self.full_json_2.clicked.connect(self.run_full_api_reader)
@@ -612,9 +616,8 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         try:
             if self.api_client.username is not None and self.api_client.encoded_password is not None and self.session_id is not None:
                 self.api_client.login()
-                self.api_client.fetch_session(self.session_id)
+                self.api_client.fetch_session(self.session_id.text())
         except Exception as ex:
-            print(ex)
             pass
 
     def run_preq_api_reader(self):
@@ -626,7 +629,6 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             self.preq_json_reader.set_output_type(str(self.output_file_format))
             self.preq_json_reader.handle_results()
         except Exception as ex:
-            print(ex)
             pass
 
     def run_full_api_reader(self):
@@ -638,7 +640,6 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             self.full_json_reader.set_output_type(str(self.output_file_format))
             self.full_json_reader.read_results()
         except Exception as ex:
-            print(ex)
             pass
 
     def set_results_file_directory(self):
@@ -653,14 +654,13 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.destination_file_dir = easygui.filesavebox()
         self.destination_file_directory.setText(f"{self.destination_file_dir}{self.output_file_format}")
 
-    def set_iracing_username(self):
+    def set_iracing_credentials(self):
+        if self.api_client.username is None or self.api_client.encoded_password is None:
+            return
         self.api_client.username = self.iracing_username.text()
-
-    def set_iracing_password(self):
         self.api_client.encode_password(self.api_client.username, self.iracing_password.text())
-
-    def set_iracing_session_id(self):
-        self.session_id = self.session_id.text()
+        keyring.set_password("PiRRR Email", os.getlogin(), self.api_client.username)
+        keyring.set_password("PiRRR Password", os.getlogin(), self.api_client.encoded_password)
 
     def toggle_output_type(self):
         if self.output_file_format == ".csv":
