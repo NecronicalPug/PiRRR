@@ -28,7 +28,7 @@ Full Version - Takes all the sessions and data up to right now.
 
 ### /data API Version
 By providing your iRacing login details and the desired session ID, you can fetch the session results via the iRacing website instead of manually exporting them
-from the iRacing UI. No login details are stored once the app is closed, the cookies file is used to reduce login attempts to the website.
+from the iRacing UI. Your login details are remembered for future use via the keyring library (https://github.com/jaraco/keyring). 
 
 It is the JSON version without the manual results fetching.
 
