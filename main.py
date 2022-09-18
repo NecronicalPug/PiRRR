@@ -24,6 +24,7 @@ import requests
 import hashlib
 import base64
 import keyring
+import argparse
 from http.cookiejar import LWPCookieJar
 from PySide6 import QtGui, QtCore, QtWidgets
 
@@ -499,7 +500,8 @@ class iRDataClientButBetter:
         self.cookie_file = cookie_file
 
         self.username = keyring.get_password("PiRRR Email", os.getlogin())
-        self.credentials_container = keyring.get_credential("PiRRR Password", os.getlogin())  # Username = Windows Username
+        self.credentials_container = keyring.get_credential("PiRRR Password",
+                                                            os.getlogin())  # Username = Windows Username
         if self.credentials_container is None:
             self.encoded_password = None
         else:
@@ -618,7 +620,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
                 self.api_client.login()
                 self.api_client.fetch_session(self.session_id.text())
         except Exception as ex:
-            pass
+            print(ex)
 
     def run_preq_api_reader(self):
         self.api_fetch_results()
@@ -641,6 +643,22 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             self.full_json_reader.read_results()
         except Exception as ex:
             pass
+
+    def mass_run_full_api_reader(self, session_id=0, destination="results", format=".xlsx"):
+        try:
+            if self.api_client.username is not None and self.api_client.encoded_password is not None:
+                self.api_client.login()
+                self.api_client.fetch_session(session_id)
+        except Exception as ex:
+            print(ex)
+        try:
+            self.full_json_reader.set_source_file("results.json")
+            self.full_json_reader.set_team_file(None)
+            self.full_json_reader.set_destination_file(destination)
+            self.full_json_reader.set_output_type(format)
+            self.full_json_reader.read_results()
+        except Exception as ex:
+            print(ex)
 
     def set_results_file_directory(self):
         dir = easygui.fileopenbox(filetypes=["*.json"])
@@ -692,7 +710,30 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
 
 
 if __name__ == "__main__":
+    argument_parser = argparse.ArgumentParser(description="Convert json/irsdk results to csv/xlsx.")
+    argument_parser.add_argument("-mass", action="store_true",
+                                 help="Mass /data api results conversion. No GUI. Enter login credentials in GUI pre-use.")
+    argument_parser.add_argument("-session_ids", nargs=1, help="Pass .txt with session IDs for -mass.")
+    argument_parser.add_argument("-csv", action="store_true",
+                                 help="File output format. Default is .xlsx. Pass this to output .csv.")
+    args = argument_parser.parse_args(sys.argv[1:])
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
-    window.show()
-    app.exec()
+    if args.mass is True:
+        if args.session_ids[0] is not None:
+            if args.csv is True:
+                file_format = ".csv"
+            else:
+                file_format = ".xlsx"
+            try:
+                with open(args.session_ids[0], "r") as session_ids:
+                    for session_id in session_ids:
+                        raw_session_id = session_id.strip('\n')
+                        results_name = f"results_{raw_session_id}{file_format}"
+                        window.mass_run_full_api_reader(int(session_id), results_name, file_format)
+            except Exception as ex:
+                print(ex)
+
+    else:
+        window.show()
+        app.exec()
