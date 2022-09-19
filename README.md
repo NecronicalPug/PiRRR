@@ -59,6 +59,7 @@ It is possible to fetch results of multiple sessions via /data API and convert t
 PiRRR.exe -mass -session_ids ".txt file directory" 
 ```
 You can also pass -csv to get all the results as a .csv file, otherwise they will be in .xlsx.
+`-h` is available for a help message.
 
 If you get a "Verification required" error, log in manually on this [website](https://members-login.iracing.com) to re-verify your account. 
 
