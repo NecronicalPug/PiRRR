@@ -8,6 +8,7 @@ What does it do:
 - Full Results (Goes through all sessions and exports most of the relevant data)
 - Can match drivers to the correct teams by looking for them in a list of teams if provided
 - Choice of output in .csv/.xlsx
+- Mass file conversion via command line arguments
 
 ## Usage
 Simply download and run the .exe in Releases.
@@ -51,6 +52,19 @@ Here is a template for the custom team file. Team name is the key and the value 
 
 ### Example of IRSDK Full Version
 ![image](https://user-images.githubusercontent.com/46400065/188338504-ed183b54-c5d8-47e1-a3f6-420f0bf85810.png)
+
+## Mass file conversion
+It is possible to fetch results of multiple sessions via /data API and convert them as normal. In a terminal of your choosing:
+```
+PiRRR.exe -mass -session_ids ".txt file directory" 
+```
+You can also pass -csv to get all the results as a .csv file, otherwise they will be in .xlsx.
+
+If you get a "Verification required" error, log in manually on this [website](https://members-login.iracing.com) to re-verify your account. 
+
+Example of valid .txt file:
+
+![image](https://user-images.githubusercontent.com/46400065/190933780-fe74a747-c500-4c72-9500-ab71bf6d50f1.png)
 
 
 ## Modifications
